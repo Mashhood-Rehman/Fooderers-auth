@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  superadmin
+  manager
+  user
+}
+
+model User {
+  id         Int     @id @default(autoincrement())
+  name       String
+  email      String  @unique
+  password   String
+  profileImg String? @default("dummyImage.webp")
+  role       Role    @default(user)
+}
+
+model Auth {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  password String
+  name     String
+}
