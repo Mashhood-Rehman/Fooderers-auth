@@ -1,6 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient()
 const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken");
 const Login = async (req, res) => {
     const { email, password } = req.body
     try {
@@ -11,11 +12,17 @@ const Login = async (req, res) => {
         if (!checkUser) {
             return res.status(400).json({ message: "User not found" })
         }
-        const comparePassword = bcrypt.compare(password, checkUser.password)
+        const comparePassword = await bcrypt.compare(password, checkUser.password)
         if (!comparePassword) {
             return res.status(400).json({ message: "Invalid Credentials" })
         }
-        return res.status(200).json({ message: "User logged in successfully" })
+        const token = jwt.sign(
+            { id: checkUser.id, email: checkUser.email ,role : checkUser.role },
+            process.env.JWT_SECRET,
+            { expiresIn: "1d" }
+        );
+        return res.status(200).json({ message: "User logged in successfully" ,   token,
+ })
     } catch (error) {
         console.log(error)
         return res.status(500).json({ message: "Internal server error" })

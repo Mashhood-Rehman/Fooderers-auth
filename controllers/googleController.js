@@ -66,7 +66,7 @@ const googleCallbackController = async (req, res) => {
             // secure: true,    // Uncomment this in production
             sameSite: 'strict', maxAge: 3600000 
         }); res.redirect("/");
-
+        
  
 
     } catch (error) {

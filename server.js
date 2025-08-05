@@ -6,16 +6,10 @@ const authRoutes = require("./routes/authRoutes")
 const googleRoutes = require("./routes/googleRoutes")
 const app = express()
 app.use(express.json())
-
-app.use("/auth", authRoutes)
+const PORT = process.env.PORT
+app.use("/api/auth", authRoutes)
 app.use("/api/google", googleRoutes)
-app.get("/", (req, res) => {
-    res.send(`
-        <h1>OAuth Test</h1>
-        <a href="/api/google/auth">Login with Google</a>
-    `);
-});
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
     console.log("port is running on port 3000 ")
 })
