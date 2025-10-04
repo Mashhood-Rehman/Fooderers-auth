@@ -17,12 +17,13 @@ const Login = async (req, res) => {
             return res.status(400).json({ message: "Invalid Credentials" })
         }
         const token = jwt.sign(
-            { id: checkUser.id, email: checkUser.email ,role : checkUser.role },
+            { id: checkUser.id, email: checkUser.email, role: checkUser.role },
             process.env.JWT_SECRET,
             { expiresIn: "1d" }
         );
-        return res.status(200).json({ message: "User logged in successfully" ,   token,
- })
+        return res.status(200).json({
+            message: "User logged in successfully", token,
+        })
     } catch (error) {
         console.log(error)
         return res.status(500).json({ message: "Internal server error" })
@@ -31,28 +32,51 @@ const Login = async (req, res) => {
 
 
 const Signup = async (req, res) => {
-    const { email, password, name } = req.body
+    const { email, password, name } = req.body;
+    
+    console.log("📝 Signup attempt:", { email, name });
+
     try {
+        // Validate input
         if (!email || !password || !name) {
+            console.log("❌ Missing fields");
             return res.status(400).json({ message: "All fields are required" });
         }
-        const checkUser = await prisma.user.findUnique({ where: { email } })
+
+        // Check if user exists
+        const checkUser = await prisma.user.findUnique({ where: { email } });
         if (checkUser) {
-            return res.status(409).json({ message: "User already exists" })
+            console.log("❌ User already exists:", email);
+            return res.status(409).json({ message: "User already exists" });
         }
-        const hashedPassword = await bcrypt.hash(password, 10)
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+        
+        // Create user
         const newUser = await prisma.user.create({
             data: {
                 email,
                 name,
                 password: hashedPassword
             }
-        })
+        });
 
-        return res.status(201).json({ message: "User created succesfully", newUser })
+        console.log("✅ User created successfully:", newUser.id);
+        return res.status(201).json({ 
+            message: "User created successfully", 
+            user: {
+                id: newUser.id,
+                email: newUser.email,
+                name: newUser.name
+            }
+        });
     } catch (error) {
-        console.error("Signup error:", error);
-        return res.status(500).json({ message: "Internal server error" });
+        console.error("❌ Signup error:", error.message);
+        return res.status(500).json({ 
+            message: "Internal server error",
+            error: error.message 
+        });
     }
 }
 

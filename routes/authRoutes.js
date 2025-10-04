@@ -1,9 +1,13 @@
-const exress = require("express")
+const express = require("express")
 const { Login, Signup } = require("../controllers/authController")
 const { protect } = require("../middleware/authMiddleware")
-const router = exress.Router()
+const router = express.Router()
 
-router.get("/login",protect ,  Login)
-router.post("/signup", Signup)
+router.post("/login", Login)
+router.post("/signup", (req, res, next) => {
+    console.log("🟢 /signup route hit");
+    console.log("Body:", req.body);
+    Signup(req, res, next);
+})
 
 module.exports = router
